@@ -1,0 +1,16 @@
+---
+- name: Netplan congifuration
+  import_tasks: netplan.yml
+
+- name: Iptables Hardening
+  import_tasks: iptables.yml
+
+- name: Install docker
+  import_role:
+    name: install-docker
+
+- name: Copy prometheus, grafana, alertmanager config files
+  import_tasks: main-config-files.yml
+
+- name: Add docker-compose tasks
+  import_tasks: docker.yml

@@ -1,0 +1,53 @@
+groups:
+- name: Alerts on exporter
+  rules:
+
+    # gateway is accessable from external network
+    - alert: GgatewayAccessibilityDown
+      expr: gateway_accessibility == 0
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Gateway accessibility down (instance {{ $labels.instance }})"
+        description: "Gateway accessibility is down on {{ $labels.instance }}\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+    # access of host to internet
+    - alert: InternetConnectionFaild
+      expr: internet_connection == 0
+      for: 0m 
+      labels:
+        severity: critical
+      annotations:
+        summary: "Internet Connection Faild (instance {{ $labels.instance }})"
+        description: "Internet connetion faild on {{ $labels.instance }}\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+        
+    # dns server can resolve address
+    - alert: DnsCanNotResolve == 0
+      expr: dns_check == 0
+      for: 3m
+      labels:
+        severity: warning
+      annotations:
+        summary: "DNS can not resolve  (instance {{ $labels.instance }})"
+        description: "DNS can not resolve  on {{ $labels.instance }}\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+    # rest api is availiable from external network
+    - alert: RestAccessibilityDown
+      expr: restapi_availability == 0
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Rest Api Accessibility Down  (instance {{ $labels.instance }})"
+        descriptaions: "Rest Api accessibility down  on {{ $labels.instance }}\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+    # nginx server is availiable from external network
+    - alert: NginxAvailabilityDown
+      expr: nginx_availability == 0
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Nginx Accessibility Down  (instance {{ $labels.instance }})"
+        descriptions: "Nginx accessibility down  on {{ $labels.instance }}\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"

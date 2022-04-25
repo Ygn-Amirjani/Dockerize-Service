@@ -1,0 +1,30 @@
+- name: Install docker
+  apt:
+    name:
+      - docker
+      - docker.io
+      - python3-docker
+    update_cache: yes
+  register: result
+  ignore_errors: True
+
+- name: Change apt repo if failure
+  copy:
+    src: asiatech
+    dest: /etc/apt/sources.list
+  when: "result.failed"
+
+- name: Install docker again
+  apt:
+    name:
+      - docker
+      - docker.io
+      - python3-docker
+    update_cache: yes
+  when: "result.failed"
+
+- name: Log into private registry
+  docker_login:
+    registry: "{{ registry }}"
+    username: "{{ registry_user }}"
+    password: "{{ registry_password }}"

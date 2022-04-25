@@ -1,0 +1,18 @@
+---
+- name: Add backup.sh File
+  template:
+    src: scripts/backup.sh
+    dest: /opt/backup.sh
+    owner: root
+    group: root
+    mode: 0744
+
+- name: Cron Job for Upload Backup Files in {{root_user}}
+  cron:
+    name: sync backup files with {{root_user}}
+    job: "rsync -rtu --delete {{backup_path}} {{root_user}}@{{ backup_host }}:{{ backup_path }}"
+
+- name: Cron Job for Backup Script
+  cron:
+    name: control backup files
+    job: "sh /opt/backup.sh"

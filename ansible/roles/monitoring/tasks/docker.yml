@@ -1,0 +1,13 @@
+---
+- name: Copy docker-compose file
+  template:
+    src: "docker/docker-compose.yml.j2"
+    dest: "{{ prometheus_path }}/docker-compose.yml"
+    owner: root
+    group: root
+    mode: 0744
+
+- name: Create and start services with docker-compose
+  docker_compose:
+    project_src: "{{ prometheus_path }}"
+  register: output

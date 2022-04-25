@@ -1,0 +1,13 @@
+---
+- name: restart resolvconf
+  service:
+    name: resolvconf
+    state: restarted
+
+- name: apply netplan
+  command: netplan apply
+  async: 45
+  poll: 0
+
+- name: restore iptables
+  shell: "iptables-restore < /etc/iptables/rules.v4"

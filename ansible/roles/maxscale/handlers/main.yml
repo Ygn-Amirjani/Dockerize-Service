@@ -1,0 +1,10 @@
+---
+- name: restart maxscale
+  docker_container:
+    name: maxscale-node
+    restart: yes
+
+- name: apply netplan
+  command: netplan apply
+  async: 45
+  poll: 0

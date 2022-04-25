@@ -1,0 +1,44 @@
+groups:
+- name: Alerts on hosting and hardware
+  rules:
+
+    # Node memory is filling up (< 10% left)
+    - alert: MemoryFull
+      expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100 < 10
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Host out of memory (instance {{ $labels.instance }})"
+        description: "Node memory is filling up (< 10% left)\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+    # Disk is almost full (< 10% left) 
+    - alert: DiskFull
+      expr: (node_filesystem_avail_bytes * 100) / node_filesystem_size_bytes < 10 and ON (instance, device, mountpoint) node_filesystem_readonly == 0
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Host disk will fill in 24 hours (instance {{ $labels.instance }})"
+        description: "Filesystem is predicted to run out of space within the next 24 hours at current write rate\n  
+                      VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+    # CPU load is > 80%                       
+    - alert: HighCpuLoad
+      expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[2m])) * 100) > 80
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Host high CPU load (instance {{ $labels.instance }})"
+        description: "CPU load is > 80%\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+    # Systemd Service Crashed
+    - alert: SystemdCrashed
+      expr: node_systemd_unit_state{state="failed"} == 1
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Host systemd service crashed (instance {{ $labels.instance }})"
+        description: "systemd service crashed\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"

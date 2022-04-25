@@ -1,0 +1,7 @@
+---
+- hosts: elk_server
+  become: True
+  roles:
+    - elk
+    - role: exporter
+      exporters: ["node", "es", "custom"]

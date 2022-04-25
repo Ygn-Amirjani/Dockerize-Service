@@ -1,0 +1,23 @@
+---
+- name: restore iptables
+  shell: "/sbin/iptables-restore < /etc/iptables/rules.v4"
+
+- name: apply netplan
+  command: netplan apply
+  async: 45
+  poll: 0
+
+- name: Restart elastic container
+  docker_container:
+    name: elasticsearch
+    restart: yes
+
+- name: Restart kibana container
+  docker_container:
+    name: kibana
+    restart: yes
+
+- name: Restart logstash container
+  docker_container:
+    name: logstash
+    restart: yes

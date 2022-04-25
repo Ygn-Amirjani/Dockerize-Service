@@ -1,0 +1,35 @@
+- hosts: mysql01
+  become: true
+  roles:
+    - install-docker
+    - role: mariadb
+      is_master: True
+      server_id: 1
+
+- hosts: mysql02
+  become: true
+  roles:
+    - install-docker
+    - role: mariadb
+      server_id: 2
+
+- hosts: mysql03
+  become: true
+  roles:
+    - install-docker
+    - role: mariadb
+      server_id: 3
+
+- hosts: maxscale01
+  become: true
+  roles:
+    - install-docker
+    - maxscale
+
+- hosts: dbserver
+  become: True
+  roles:
+    - mysql
+    - role: exporter
+      exporters: ["mysql", "node", "custom"]
+    - filebeat-agent

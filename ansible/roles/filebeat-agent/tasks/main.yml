@@ -1,0 +1,22 @@
+---
+- name: Create {{ work_dir }} directory
+  file:
+    name: "{{ work_dir }}"
+    state: directory
+
+- name: Copy config file
+  template:
+    src: filebeat.yml.j2
+    dest: "{{ work_dir }}/filebeat.yml"
+  notify: filebeat restart
+
+- name: Run filebeat service
+  docker_container:
+    name: filebeat
+    image: "{{ registry }}/filebeat:{{ filebeat_image_version }}"
+    restart_policy: unless-stopped
+    volumes:
+      - /var/log/syslog:/var/log/syslog:ro,rslave
+      - /var/log/auth.log:/var/log/auth.log:ro,rslave
+      - "{{ work_dir }}/filebeat.yml:/usr/share/filebeat/filebeat.yml"
+    user: root

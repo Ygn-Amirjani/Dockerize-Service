@@ -1,0 +1,11 @@
+*filter
+-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A INPUT -p tcp --dport 9090 -j ACCEPT
+-A INPUT -s {{nginx_private_ip}} -p tcp --dport 3000 -j ACCEPT
+-A INPUT -p tcp --dport 9093 -j ACCEPT
+-A INPUT -s {{ gateway_private_ip_eth1 }} -p tcp --dport 22 -j ACCEPT
+-A INPUT -i lo -p udp --dport 53 -j ACCEPT
+-A INPUT -s {{ gateway_private_ip_eth1 }}/32 -j ACCEPT
+-A INPUT -p icmp -j ACCEPT
+-A INPUT -j DROP
+COMMIT

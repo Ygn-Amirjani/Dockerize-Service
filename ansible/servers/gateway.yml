@@ -1,0 +1,8 @@
+---
+- hosts: gateway
+  become: True
+  roles:
+    - gateway
+    - install-docker
+    - role: exporter
+      exporters: ["node"]

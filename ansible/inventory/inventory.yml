@@ -1,0 +1,35 @@
+gateway:
+  hosts: localhost
+  vars:
+    ansible_connection: local
+    ansible_ssh_user: root
+
+gateway_pub:
+  hosts: 188.121.123.239
+
+restapi:
+  hosts: 01-restapi
+
+webserver:
+  hosts: 01-webserver
+
+dbserver:
+  hosts: 01-dbserver
+
+elk_server:
+  hosts: 01-elk_server
+
+Monitoring:
+  hosts: 01-monitor
+
+mysql01:
+  hosts: 01-mysql
+
+mysql02:
+  hosts: 02-mysql
+
+mysql03:
+  hosts: 03-mysql
+
+maxscale01:
+  hosts: 01-maxscale

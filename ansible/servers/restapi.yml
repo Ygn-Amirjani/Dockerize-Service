@@ -1,0 +1,8 @@
+---
+- hosts: restapi
+  become: True
+  roles:
+    - restApi-server
+    - role: exporter
+      exporters: ["node", "custom"]
+    - filebeat-agent

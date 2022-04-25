@@ -1,0 +1,10 @@
+---
+- name: install docker-compose
+  apt:
+    name:
+      - docker-compose
+    update_cache: yes
+
+- name: docker-composer up
+  docker_compose:
+    project_src: elk-all-file

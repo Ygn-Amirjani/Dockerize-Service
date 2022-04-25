@@ -1,0 +1,31 @@
+http.host: "0.0.0.0"
+
+# Settings file in YAML
+pipeline.batch.size: 125
+pipeline.batch.delay: 5
+#
+# ------------  Node identity ------------
+# Use a descriptive name for the node:
+node.name: logstash-node
+#
+# ------------ Data path ------------------
+# Which directory should be used by logstash and its plugins
+# for any persistent needs. Defaults to LOGSTASH_HOME/data
+#
+# ------------ Pipeline Settings --------------
+# The ID of the pipeline.
+pipeline.id: main
+#
+# This defaults to the number of the host's CPU cores.
+pipeline.workers: 2
+#
+# ------------ Debugging Settings --------------
+# Options for log.level:
+#   * fatal
+#   * error
+#   * warn
+#   * info (default)
+#   * debug
+#   * trace
+#
+log.level: error

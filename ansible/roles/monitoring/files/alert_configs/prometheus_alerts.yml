@@ -1,0 +1,53 @@
+groups:
+- name: Alerts on Prometheus Self Monitoring
+  rules:
+  
+    # A Prometheus target has disappeared. An exporter might be crashed. 
+    - alert: InstanceDown
+      expr: up == 0
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Prometheus target missing (instance {{ $labels.instance }})"
+        description: "A Prometheus target has disappeared. An exporter might be crashed.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+    # Prometheus has no target in service discovery
+    - alert: TargetEmpty
+      expr: prometheus_sd_discovered_targets == 0
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Prometheus target empty (instance {{ $labels.instance }})"
+        description: "Prometheus has no target in service discovery\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+    # Prometheus is scraping exporters slowly 
+    - alert: ScrapingSlow
+      expr: prometheus_target_interval_length_seconds{quantile="0.9"} > 60
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Prometheus target scraping slow (instance {{ $labels.instance }})"
+        description: "Prometheus is scraping exporters slowly\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+    # Prometheus has many scrapes that exceed the sample limit
+    - alert: LargeScrape
+      expr: increase(prometheus_target_scrapes_exceeded_sample_limit_total[10m]) > 10
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Prometheus large scrape (instance {{ $labels.instance }})"
+        description: "Prometheus has many scrapes that exceed the sample limit\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+    # Prometheus cannot connect the alertmanager 
+    - alert: ConnectedToAlertmanager
+      expr: prometheus_notifications_alertmanagers_discovered < 1
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Prometheus not connected to alertmanager (instance {{ $labels.instance }})"
+        description: "Prometheus cannot connect the alertmanager\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"

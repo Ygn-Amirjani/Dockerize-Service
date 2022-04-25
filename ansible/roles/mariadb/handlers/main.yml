@@ -1,0 +1,10 @@
+---
+- name: resatrt mariadb
+  docker_container:
+    name: maridb-node
+    restart: yes
+
+- name: apply netplan
+  command: netplan apply
+  async: 45
+  poll: 0

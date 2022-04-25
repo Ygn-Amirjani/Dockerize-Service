@@ -1,0 +1,13 @@
+- name: Run Rest api service
+  docker_container:
+    name: restapi
+    image: "{{ registry }}/rest-api"
+    restart_policy: unless-stopped
+    # ports:
+    #   - 18080:18080
+    env:
+      DATABASE_USERNAME: "{{ phonebook_username }}"
+      DATABASE_PASSWORD: "{{ phonebook_password }}"
+      DATABASE_SERVER: "{{ gateway_private_ip_eth1 }}"
+      DATABASE_DB: "{{ phonebook_db }}"
+    network_mode: "host"

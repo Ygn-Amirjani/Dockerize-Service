@@ -1,0 +1,94 @@
+---
+- name: Install required packages
+  apt:
+    name:
+      - docker-compose
+    update_cache: yes
+
+- name: Create prometheus directory
+  file:
+    path: "{{ prometheus_path }}"
+    state: "directory"
+    owner: root
+    group: root
+    mode: 0744
+  become: true
+
+- name: Copy the config file of Prometheus
+  template:
+    src: main-config/prometheus.yml.j2
+    dest: "{{ prometheus_path }}/prometheus.yml"
+    mode: 0744
+  notify: Restart prometheus container
+
+- name: Copy file-based service discovery of prometheus
+  template:
+    src: main-config/targets.json.j2
+    dest: "{{prometheus_path}}/targets.json"
+    mode: 0744
+
+- name: Copy the alert rules to server
+  copy:
+    src: "{{ item }}"
+    dest: "{{ prometheus_path }}"
+    mode: 0744
+  loop:
+    - alert_configs/elasticsearch_alerts.yml
+    - alert_configs/identical_alerts.yml
+    - alert_configs/mysql_alerts.yml
+    - alert_configs/nginx_alerts.yml
+    - alert_configs/prometheus_alerts.yml
+    - alert_configs/exporter_alerts.yml
+  notify: Restart prometheus container
+
+- name: Create grafana directory
+  file:
+    path: "{{ grafana_path }}/provisioning/{{ item }}"
+    state: "directory"
+    owner: root
+    group: root
+    mode: 0744
+  loop:
+    - "dashboards"
+    - "datasources"
+
+- name: Copy dashboard files
+  copy:
+    src: dashboards/{{ item }}
+    dest: "{{grafana_path}}/provisioning/dashboards/{{ item }}"
+    mode: 0744
+  loop:
+    - Cexporter.json
+    - ES-exporter.json
+    - Mysql-exporter.json
+    - Nginx-exporter.json
+    - Node-exporter.json
+
+- name: Copy provisioning/datasource in grafana
+  template:
+    src: datasource/datasource.yml.j2
+    dest: "{{ grafana_path }}/provisioning/datasources/datasource.yml"
+    mode: 0744
+  notify: Restart grafana container
+
+- name: Copy provisioning/dashboards in grafana
+  template:
+    src: dashboards/dashboard.yml.j2
+    dest: "{{ grafana_path }}/provisioning/dashboards/dashboard.yml"
+    mode: 0744
+  notify: Restart grafana container
+
+- name: Create alertmanager directory
+  file:
+    path: "{{ alertmanager_path }}"
+    state: "directory"
+    owner: root
+    group: root
+    mode: 0744
+
+- name: Copy the config file of alertmanager
+  template:
+    src: main-config/alertmanager.yml.j2
+    dest: "{{ alertmanager_path }}/alertmanager.yml"
+    mode: 0744
+  notify: Restart alertmanager container

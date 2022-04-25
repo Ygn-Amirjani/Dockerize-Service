@@ -1,0 +1,48 @@
+image:
+  name: docker:19.03.12
+stages:
+  - build
+  - push
+
+services:
+  - docker:19.03.12-dind
+
+build:
+  stage: build
+  only:
+    - main
+  before_script:
+    - docker info
+    - docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
+  script:
+    - >
+      docker build
+      --pull
+      --cache-from ${CI_REGISTRY}/cexporter:latest
+      -t ${CI_REGISTRY}/cexporter:${CI_COMMIT_SHORT_SHA}
+      .
+    - docker push ${CI_REGISTRY}/cexporter:${CI_COMMIT_SHORT_SHA}
+
+Push latest:
+  stage: push
+  only:
+    - main
+  before_script:
+    - docker info
+    - docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
+  script:
+    - docker pull ${CI_REGISTRY}/cexporter:${CI_COMMIT_SHORT_SHA}
+    - docker tag ${CI_REGISTRY}/cexporter:${CI_COMMIT_SHORT_SHA} ${CI_REGISTRY}/cexporter:latest
+    - docker push ${CI_REGISTRY}/cexporter:latest
+
+Push tag:
+  stage: push
+  only:
+    - tags
+  before_script:
+    - docker info
+    - docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
+  script:
+    - docker pull ${CI_REGISTRY}/cexporter:${CI_COMMIT_SHORT_SHA}
+    - docker tag ${CI_REGISTRY}/cexporter:${CI_COMMIT_SHORT_SHA} ${CI_REGISTRY}/cexporter:${CI_COMMIT_REF_NAME}
+    - docker push ${CI_REGISTRY}/cexporter:${CI_COMMIT_REF_NAME}

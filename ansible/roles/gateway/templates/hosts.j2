@@ -1,0 +1,16 @@
+127.0.1.1 gateway-bukhara.novalocal gateway-bukhara
+127.0.0.1 localhost
+
+# The following lines are desirable for IPv6 capable hosts
+::1 localhost ip6-localhost ip6-loopback
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+
+{{ restapi_private_ip }} 01-restapi
+{{ nginx_private_ip }} 01-webserver
+{{ mysql_private_ip }} 01-dbserver
+{{ elk_private_ip }} 01-elk_server
+{{ maridb_node01_ip }} 01-mysql
+{{ maridb_node02_ip }} 02-mysql
+{{ maridb_node03_ip }} 03-mysql
+{{ maxscale_ip }} 01-maxscale

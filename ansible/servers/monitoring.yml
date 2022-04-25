@@ -1,0 +1,7 @@
+---
+- hosts: Monitoring
+  become: True
+  roles:
+    - monitoring
+    - role: exporter
+      exporters: ["node"]

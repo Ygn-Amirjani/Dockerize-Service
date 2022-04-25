@@ -1,0 +1,31 @@
+# NAT CHAIN
+*nat
+-A PREROUTING -s {{ nginx_private_ip }}/32 -d {{ gateway_private_ip_eth1 }}/32 -p tcp -m tcp --dport 3306 -j DNAT --to-destination {{ mysql_private_ip }}:3306
+-A POSTROUTING -s {{ nginx_private_ip }}/32 -d {{ mysql_private_ip }}/32 -j SNAT --to-source {{ gateway_private_ip_eth2 }}
+
+-A PREROUTING -s {{ restapi_private_ip }}/32 -d {{ gateway_private_ip_eth1 }}/32 -p tcp -m tcp --dport 3306 -j DNAT --to-destination {{ mysql_private_ip }}:3306
+-A POSTROUTING -s {{ restapi_private_ip }}/32 -d {{ mysql_private_ip }}/32 -j SNAT --to-source {{ gateway_private_ip_eth2 }}
+
+-A PREROUTING -s {{ monitor_private_ip }}/32 -d {{ gateway_private_ip_eth1 }}/32 -p tcp -m tcp --dport 9210 -j DNAT --to-destination {{ mysql_private_ip }}:9110
+-A PREROUTING -s {{ monitor_private_ip }}/32 -d {{ gateway_private_ip_eth1 }}/32 -p tcp -m tcp --dport 9204 -j DNAT --to-destination {{ mysql_private_ip }}:9104
+-A PREROUTING -s {{ monitor_private_ip }}/32 -d {{ gateway_private_ip_eth1 }}/32 -p tcp -m tcp --dport 9200 -j DNAT --to-destination {{ mysql_private_ip }}:9100
+-A POSTROUTING -s {{ monitor_private_ip }}/32 -d {{ mysql_private_ip }}/32 -j SNAT --to-source {{ gateway_private_ip_eth2 }}
+
+-A POSTROUTING -o eth0 -j MASQUERADE
+COMMIT
+# FILTER CHAIN
+*filter
+-A FORWARD -i eth2 -o eth0 -j ACCEPT
+-A FORWARD -i eth0 -o eth2 -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A FORWARD -i eth1 -o eth0 -p tcp -m tcp --dport 80 --tcp-flags FIN,SYN,RST,ACK SYN -m conntrack --ctstate NEW -j ACCEPT
+-A FORWARD -i eth1 -o eth0 -j ACCEPT
+-A FORWARD -i eth0 -o eth2 -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A FORWARD -i eth0 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A FORWARD -i eth2 -o eth0 -j ACCEPT
+-A FORWARD -i eth0 -o eth2 -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A FORWARD -s {{ restapi_private_ip }}/32 -d {{ mysql_private_ip }}/32 -i eth1 -o eth2 -p tcp -m tcp --dport 3306 --tcp-flags FIN,SYN,RST,ACK SYN -j ACCEPT
+-A FORWARD -s {{ nginx_private_ip }}/32 -d {{ mysql_private_ip }}/32 -i eth1 -o eth2 -p tcp -m tcp --dport 3306 --tcp-flags FIN,SYN,RST,ACK SYN -j ACCEPT
+-A FORWARD -s {{ monitor_private_ip }}/32 -d {{ mysql_private_ip }}/32 -i eth1 -o eth2 -p tcp -m tcp --dport 3306 --tcp-flags FIN,SYN,RST,ACK SYN -j ACCEPT
+-A FORWARD -i eth2 -o eth1 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+-A FORWARD -s {{ gateway_private_ip_eth2 }}/32 -d {{ mysql_private_ip }}/32 -j ACCEPT
+COMMIT

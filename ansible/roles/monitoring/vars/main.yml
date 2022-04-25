@@ -1,0 +1,26 @@
+---
+# information email alert
+email: alirezaazizi1396622@gmail.com
+password: fjbcmclagunlmcld
+
+# Version
+prometheus_version: 2.34.0
+alertmanager_version: 0.24.0-rc.0
+grafana_version: 8.4.4
+
+# Grafana
+grafana_username: "admin"
+grafana_password: !vault |
+  $ANSIBLE_VAULT;1.1;AES256
+  66386237376665626364393135353432623236373737396365316163666633386130653832386330
+  3736316239326537663739373334316534616332393864330a383630363563633838303238623232
+  33383139353630376633626361376262623130333462383365353964376361393662663138306636
+  3034383039373765660a663230646532393235306539643236316435313461363666363563636436
+  6531
+prometheus_url: https://prometheus.bukhara-chkh.ir
+grafana_url: https://grafana.bukhara-chkh.ir
+
+# Docker info
+prometheus_path: "/usr/local/share/prometheus"
+grafana_path: "/var/lib/grafana"
+alertmanager_path: "/usr/local/bin/alertmanager"

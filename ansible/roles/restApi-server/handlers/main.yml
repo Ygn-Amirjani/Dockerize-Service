@@ -1,0 +1,8 @@
+---
+- name: restore iptables
+  shell: "/sbin/iptables-restore < /etc/iptables/rules.v4"
+
+- name: apply netplan
+  command: netplan apply
+  async: 45
+  poll: 0

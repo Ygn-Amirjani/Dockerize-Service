@@ -1,0 +1,56 @@
+---
+- name: Iptables Hardening
+  import_tasks: iptables.yml
+
+- name: Install Requirements
+  apt:
+    name:
+      - resolvconf
+      - s3cmd
+    update_cache: yes
+
+- name: Add DNS Addresses
+  blockinfile:
+    path: /etc/resolvconf/resolv.conf.d/head
+    block: |
+      nameserver 1.1.1.1
+      nameserver 8.8.8.8
+      nameserver 3.3.3.3
+      nameserver 4.2.2.4
+  notify: restart resolvconf
+
+- name: Set ip_forward
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: "1"
+    sysctl_set: yes
+    reload: yes
+
+- name: Copy s3cmd config file
+  template:
+    src: s3cmd/.s3cfg.j2
+    dest: /root/.s3cfg
+
+- name: Cron Job for Upload backup files to Object Storage
+  cron:
+    name: upload backup files
+    job: "s3cmd -c /root/.s3cfg sync {{ backup_path }} --preserve --delete-removed s3://{{ s3_sandoghche }}"
+    special_time: hourly
+    state: present
+
+- name: Copy backup controll script
+  template:
+    src: backup/script.sh
+    dest: /opt/script.sh
+
+- name: Cron job for backup control script
+  cron:
+    name: control backup files
+    job: "/opt/script.sh"
+    special_time: hourly
+    state: present
+
+- name: Copy hosts file
+  template:
+    src: hosts.j2
+    dest: /etc/hosts

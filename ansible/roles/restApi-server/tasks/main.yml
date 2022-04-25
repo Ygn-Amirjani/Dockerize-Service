@@ -1,0 +1,25 @@
+---
+- name: Copy netplan Config File
+  template:
+    src: netplan/50-cloud-init.yaml.j2
+    dest: /etc/netplan/50-cloud-init.yaml
+    owner: root
+    group: root
+    mode: 0744
+  notify: apply netplan
+
+- name: Force for apply netplan
+  meta: flush_handlers
+
+- name: run iptables
+  import_tasks: iptables.yml
+
+- name: Force for apply netplan
+  meta: flush_handlers
+
+- name: Install docker
+  import_role:
+    name: install-docker
+
+- name: docker tasks
+  import_tasks: docker.yml

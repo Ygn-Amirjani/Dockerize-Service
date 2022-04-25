@@ -1,0 +1,14 @@
+*filter
+-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+{% for item in [9110, 9093, 9100, 9113] %}
+-A INPUT -p tcp --dport {{ item }} -s {{ monitor_private_ip }} -j ACCEPT
+{% endfor %}
+-A INPUT -p tcp --dport 80 -j ACCEPT 
+-A INPUT -p tcp --dport 8080 -s 127.0.0.1 -j ACCEPT 
+-A INPUT -p tcp --dport 22 -s {{ gateway_private_ip_eth1 }} -j ACCEPT 
+-A INPUT -p udp --dport 53 -i lo -j ACCEPT 
+-A INPUT -m limit --limit 5/min -j LOG --log-prefix "iptables block: " --log-level 7
+-A INPUT -p icmp -j ACCEPT
+-A INPUT -j DROP
+COMMIT
+

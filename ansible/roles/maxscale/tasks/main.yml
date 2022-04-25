@@ -1,0 +1,23 @@
+---
+- name: Netplan congifuration
+  import_tasks: netplan.yml
+
+- name: Create config directory
+  file:
+    name: "{{ work_dir }}"
+    state: directory
+
+- name: Copy config file
+  template:
+    src: maxscale.cnf.j2
+    dest: "{{ work_dir }}/maxscale.cnf"
+  notify: restart maxscale
+
+- name: Create maxscale service
+  docker_container:
+    image: registry.bukhara-chkh.ir/maxscale:6.3
+    name: maxscale-node
+    volumes:
+      - "{{ work_dir }}/maxscale.cnf:/etc/maxscale.cnf"
+    network_mode: host
+    restart_policy: unless-stopped

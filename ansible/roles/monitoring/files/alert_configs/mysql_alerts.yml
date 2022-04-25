@@ -1,0 +1,43 @@
+groups:
+- name: Alerts on Mysql server
+  rules:
+
+    # MySQL instance is down
+    - alert: MysqlDown 
+      expr: mysql_up == 0
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: "MySQL down (instance {{ $labels.instance }})"
+        description: "MySQL instance is down on {{ $labels.instance }}\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+    # More than 80% of MySQL connections are in use 
+    - alert: ManyConnections
+      expr: max_over_time(mysql_global_status_threads_connected[1m]) / mysql_global_variables_max_connections * 100 > 80
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "MySQL too many connections (> 80%) (instance {{ $labels.instance }})"
+        description: "More than 80% of MySQL connections are in use on {{ $labels.instance }}\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+    # MySQL server mysql has some new slow query. 
+    - alert: SlowQueries
+      expr: increase(mysql_global_status_slow_queries[1m]) > 0
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "MySQL slow queries (instance {{ $labels.instance }})"
+        description: "MySQL server mysql has some new slow query.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+    # MySQL has just been restarted
+    - alert: MysqlRestarted
+      expr: mysql_global_status_uptime < 60
+      for: 0m
+      labels:
+        severity: info
+      annotations:
+        summary: "MySQL restarted (instance {{ $labels.instance }})"
+        description: "MySQL has just been restarted, less than one minute ago on {{ $labels.instance }}.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"

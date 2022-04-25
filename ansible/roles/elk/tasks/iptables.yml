@@ -1,0 +1,14 @@
+---
+- name: install iptables-persistent
+  apt:
+    name: iptables-persistent
+    update_cache: yes
+
+- name: copy iptables template rules over to /etc/iptables
+  template:
+    src: iptables/iptables.j2
+    dest: /etc/iptables/rules.v4
+  notify: restore iptables
+
+- name: Force for apply netplan
+  meta: flush_handlers

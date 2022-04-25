@@ -1,0 +1,4 @@
+---
+work_dir: /filebeat
+logstash_host: "{{ elk_private_ip }}:5044"
+filebeat_image_version: 7.17.1

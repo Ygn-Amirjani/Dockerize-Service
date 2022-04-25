@@ -1,0 +1,15 @@
+network:
+    version: 2
+    ethernets:
+        eth0:
+            addresses:
+            - {{ ansible_eth0.ipv4.address }}/24
+            gateway4: {{ gateway_private_ip_eth1 }}
+            match:
+                macaddress: {{ ansible_eth0["macaddress"] }}
+            nameservers:
+                addresses:
+                    - 8.8.8.8
+                    - 1.1.1.1
+            mtu: 1442
+            set-name: eth0

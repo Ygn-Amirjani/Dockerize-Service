@@ -1,0 +1,38 @@
+---
+- name: Mysql Install Required Packages
+  apt:
+    name:
+      - python3-mysqldb
+    update_cache: yes
+
+- name: Create All mysql Databases
+  mysql_db:
+    name:
+      - "{{worpresss_db}}"
+      - "{{phonebook_db}}"
+    login_host: "{{login_host}}"
+    login_user: "{{root_user}}"
+    login_password: "{{root_password}}"
+    state: present
+
+- name: Create rest-user and Set mysql privileges
+  mysql_user:
+    login_host: "{{login_host}}"
+    login_user: "{{root_user}}"
+    login_password: "{{root_password}}"
+    name: "{{phonebook_username}}"
+    password: "{{phonebook_password}}"
+    priv: "{{phonebook_db}}.*:ALL"
+    host: "%"
+    state: present
+
+- name: Create web-user and Set mysql privileges
+  mysql_user:
+    login_host: "{{login_host}}"
+    login_user: "{{root_user}}"
+    login_password: "{{root_password}}"
+    name: "{{wordpress_username}}"
+    password: "{{wordpress_password}}"
+    priv: "{{worpresss_db}}.*:ALL"
+    host: "%"
+    state: present

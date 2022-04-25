@@ -1,0 +1,8 @@
+stages:
+  - lint
+
+ansible-lint:
+  image: registry.bukhara-chkh.ir/ansible-lint:3-slim
+  stage: lint
+  script:
+    - ANSIBLE_CONFIG=ansible.cfg ansible-lint .

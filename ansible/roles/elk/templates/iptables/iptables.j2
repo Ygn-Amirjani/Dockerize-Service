@@ -1,0 +1,13 @@
+*filter
+-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A INPUT -s {{ nginx_private_ip }} -p tcp --dport 5601 -j ACCEPT
+-A INPUT -p tcp --dport 5044 -j ACCEPT
+{% for item in open_input_ports %}
+-A INPUT -s {{ monitor_private_ip }} -p tcp --dport {{ item }} -j ACCEPT
+{% endfor %}
+-A INPUT -p tcp --dport 22 -s {{ gateway_private_ip_eth1 }} -j ACCEPT
+-A INPUT -p udp --dport 53 -i lo -j ACCEPT
+-A INPUT -m limit --limit 5/min -j LOG --log-prefix "iptables block: " --log-level 7
+-A INPUT -p icmp -j ACCEPT
+-P INPUT DROP
+COMMIT

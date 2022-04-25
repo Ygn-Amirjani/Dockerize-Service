@@ -1,0 +1,61 @@
+---
+- name: Netplan congifuration
+  import_tasks: netplan.yml
+
+- name: Install python module for mysql
+  apt:
+    name: python3-mysqldb
+    state: present
+
+- name: Create mariadb service
+  docker_container:
+    image: "{{ registry }}/mariadb:10.7.3"
+    name: maridb-node
+    network_mode: host
+    volumes:
+      - /dbdata:/var/lib/mysql
+    env:
+      MYSQL_ROOT_USER: "{{root_user}}"
+      MYSQL_ROOT_PASSWORD: "{{root_password}}"
+    restart_policy: unless-stopped
+    command: mysqld --log-bin=mariadb-bin --binlog-format=ROW --log-slave-updates --server-id={{ server_id }}
+
+- name: Waits for mysql to start
+  wait_for:
+    host: 127.0.0.1
+    port: 3306
+    delay: 5
+
+- name: Setup master
+  mysql_query:
+    login_host: 127.0.0.1
+    login_password: "{{root_password}}"
+    query:
+      - RESET MASTER
+      - SET GLOBAL max_connections=1000
+      - SET GLOBAL gtid_strict_mode=ON
+  when: is_master
+
+- name: Create superuser
+  mysql_user:
+    login_host: 127.0.0.1
+    login_password: "{{root_password}}"
+    name: "{{ maxscale_user }}"
+    host: "%"
+    password: "{{ maxscale_password }}"
+    priv: "*.*:ALL"
+    state: present
+  when: is_master
+
+- name: Setup slave
+  mysql_query:
+    login_host: 127.0.0.1
+    login_password: "{{root_password}}"
+    query:
+      - RESET MASTER
+      - SET GLOBAL max_connections=1000
+      - SET GLOBAL gtid_strict_mode=ON
+      - STOP SLAVE
+      - CHANGE MASTER TO MASTER_HOST='{{ mariadb_master }}', MASTER_PORT=3306, MASTER_USER='{{ maxscale_user }}', MASTER_PASSWORD='{{ maxscale_password }}', MASTER_USE_GTID=slave_pos
+      - START SLAVE
+  when: not is_master

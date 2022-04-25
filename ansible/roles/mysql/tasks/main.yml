@@ -1,0 +1,29 @@
+---
+- name: Netplan congifuration
+  import_tasks: netplan.yml
+
+- name: Iptables Hardening
+  import_tasks: iptables.yml
+
+- name: Install docker
+  import_role:
+    name: install-docker
+
+- name: Add docker tasks
+  import_tasks: docker.yml
+
+- name: Create user and databases
+  import_tasks: database.yml
+
+- name: Backup configuration
+  import_tasks: backup.yml
+
+- name: Generate ssh keys
+  openssh_keypair:
+    path: ~/.ssh/id_rsa
+
+- name: Fetch the keyfile from one server to another
+  fetch:
+    src: "~/.ssh/id_rsa.pub"
+    dest: "id_rsa.pub"
+    flat: yes

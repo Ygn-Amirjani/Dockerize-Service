@@ -1,0 +1,23 @@
+---
+- name: Restart prometheus container
+  docker_container:
+    name: prometheus
+    restart: yes
+
+- name: Restart grafana container
+  docker_container:
+    name: grafana
+    restart: yes
+
+- name: Restart alertmanager container
+  docker_container:
+    name: alertmanager
+    restart: yes
+
+- name: apply netplan
+  command: netplan apply
+  async: 45
+  poll: 0
+
+- name: restore iptables
+  shell: "iptables-restore < /etc/iptables/rules.v4"

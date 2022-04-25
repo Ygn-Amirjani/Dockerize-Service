@@ -1,0 +1,16 @@
+---
+- name: Netplan congifuration
+  import_tasks: netplan.yml
+
+- name: run iptables
+  import_tasks: iptables.yml
+
+- name: Install docker
+  import_role:
+    name: install-docker
+
+- name: copy the elasticsearch, kibana, logstash files to remote server
+  import_tasks: transfer_original_files.yml
+
+- name: docker-compose up
+  import_tasks: elk_docker.yml

@@ -1,0 +1,78 @@
+# ============================== Filebeat inputs ===============================
+filebeat.inputs:
+  # filestream is an input for collecting log messages from files.
+
+  - type: log
+    enabled: true
+    # Paths that should be crawled and fetched. Glob based paths.
+    paths:
+      - /var/log/syslog
+    tags: ["syslog"]
+    fields:
+      index_name: syslog
+
+  - type: log
+    enabled: true
+    paths:
+      - /var/log/auth.log
+    tags: ["authlog"]
+    fields:
+      index_name: authlog
+
+# ============================== Filebeat modules ==============================
+filebeat.config.modules:
+  # Glob pattern for configuration loading
+  path: ${path.config}/modules.d/*.yml
+
+  # Set to true to enable config reloading
+  reload.enabled: false
+
+# ======================= Elasticsearch template setting =======================
+setup.ilm.enabled: true
+
+#setup.template.name: "syslog"
+#setup.template.pattern: "syslog-*"
+setup.template.settings:
+  index.number_of_shards: 1
+  index.number_of_replica: 0
+
+# =================================== Kibana ===================================
+# Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API.
+# This requires a Kibana endpoint configuration.
+#setup.kibana:
+
+# Kibana Host
+#host: "192.168.0.133:5601"
+
+# ================================== Outputs ===================================
+# Configure what output to use when sending the data collected by the beat.
+
+# ------------------------------ Logstash Output -------------------------------
+output.logstash:
+  # The Logstash hosts
+  hosts: ["{{ logstash_host }}"]
+  loadbalance: true
+  worker: 2
+
+# ================================= Processors =================================
+processors:
+  - add_host_metadata:
+      when.not.contains.tags: forwarded
+  - add_cloud_metadata: ~
+  - add_docker_metadata: ~
+  - add_kubernetes_metadata: ~
+
+# ================================== Logging ===================================
+# Sets log level. The default log level is info.
+# Available log levels are: error, warning, info, debug
+logging.level: error
+logging.to_files: true
+logging.files:
+  path: /var/log/filebeat
+  name: filebeat
+  keepfiles: 7
+  permissions: 0640
+# At debug level, you can selectively enable logging only for some components.
+# To enable all selectors use ["*"]. Examples of other selectors are "beat",
+# "publisher", "service", "harvester", "input".
+logging.selectors: ["*"]

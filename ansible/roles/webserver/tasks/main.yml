@@ -1,0 +1,13 @@
+---
+- name: Netplan congifuration
+  import_tasks: netplan.yml
+
+- name: Iptables Hardening
+  import_tasks: iptables.yml
+
+- name: Install docker
+  import_role:
+    name: install-docker
+
+- name: Add docker tasks
+  import_tasks: docker.yml

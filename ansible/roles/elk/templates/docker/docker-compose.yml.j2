@@ -1,0 +1,48 @@
+version: '3'
+
+services:
+
+  elasticsearch:
+    container_name: elasticsearch
+    hostname: elasticsearch
+    image: "{{ registry }}/elasticsearch:{{ elk_version }}"
+    ports:
+      - 9200:9200
+    volumes:
+      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro,z
+      - elasticsearch:/usr/share/elasticsearch/data:z
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+      ELASTIC_USERNAME: "{{ elasticsearch_username }}"
+      ELASTIC_PASSWORD: "{{ elasticsearch_password }}"
+    restart: unless-stopped
+
+  logstash:
+    container_name: logstash
+    hostname: logstash
+    image: "{{ registry }}/logstash:{{ elk_version }}"
+    ports:
+      - 5044:5044
+    volumes:
+      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro,Z
+      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro,Z
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+    depends_on:
+      - elasticsearch
+    restart: unless-stopped
+  
+  kibana:
+    container_name: kibana
+    hostname: kibana
+    image: "{{ registry }}/kibana:{{ elk_version }}"
+    ports:
+      - 5601:5601
+    volumes:
+      - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro,Z
+    depends_on:
+      - elasticsearch
+    restart: unless-stopped
+
+volumes:
+  elasticsearch:

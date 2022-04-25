@@ -1,0 +1,53 @@
+---
+- name: create directory for elasticsearch file
+  file:
+    path: "{{ elk_main_path }}/elasticsearch/config"
+    state: directory
+    mode: 0755
+
+- name: copy elasticsearch.yml in remote server
+  template:
+    src: elasticsearch/elasticsearch.yml.j2
+    dest: "{{ elk_main_path }}/elasticsearch/config/elasticsearch.yml"
+  notify: Restart elastic container
+
+- name: create directory for kibana file
+  file:
+    path: "{{ elk_main_path }}/kibana/config"
+    state: directory
+    mode: 0755
+
+- name: copy kibana.yml in remote server
+  template:
+    src: kibana/kibana.yml.j2
+    dest: "{{ elk_main_path }}/kibana/config/kibana.yml"
+  notify: Restart kibana container
+
+- name: create directory for logstash file
+  file:
+    path: "{{ elk_main_path }}/logstash/config"
+    state: directory
+    mode: 0755
+
+- name: copy logstash.yml in remote server
+  template:
+    src: logstash/logstash.yml.j2
+    dest: "{{ elk_main_path }}/logstash/config/logstash.yml"
+  notify: Restart logstash container
+
+- name: create directory for pipeline file
+  file:
+    path: "{{ elk_main_path }}/logstash/pipeline"
+    state: directory
+    mode: 0755
+
+- name: copy pipeline/logstash.conf in remote server
+  template:
+    src: logstash/logstash.conf
+    dest: "{{ elk_main_path }}/logstash/pipeline/logstash.conf"
+  notify: Restart logstash container
+
+- name: copy docker-compose.yml in remote server
+  template:
+    src: docker/docker-compose.yml.j2
+    dest: "{{ elk_main_path }}/docker-compose.yml"

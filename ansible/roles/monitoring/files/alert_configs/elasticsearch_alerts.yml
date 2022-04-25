@@ -1,0 +1,33 @@
+groups:
+- name: Alerts on elasticsearch 
+  rules:
+
+    # The heap usage is over 90% 
+    - alert: HeapUsageHigh
+      expr: (elasticsearch_jvm_memory_used_bytes{area="heap"} / elasticsearch_jvm_memory_max_bytes{area="heap"}) * 100 > 90
+      for: 0m
+      labels:
+         severity: critical
+      annotations:
+        summary: "Elasticsearch Heap Usage Too High (instance {{ $labels.instance }})"
+        description: "The heap usage is over 90%\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+    # The disk usage is over 90% 
+    - alert: DiskoutOfSpace
+      expr: elasticsearch_filesystem_data_available_bytes / elasticsearch_filesystem_data_size_bytes * 100 < 10
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Elasticsearch disk out of space (instance {{ $labels.instance }})"
+        description: "The disk usage is over 90%\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+    # Elastic Cluster Red status 
+    - alert: ClusterRed
+      expr: elasticsearch_cluster_health_status{color="red"} == 1
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: Elasticsearch Cluster Red (instance {{ $labels.instance }})
+        description: "Elastic Cluster Red status\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"

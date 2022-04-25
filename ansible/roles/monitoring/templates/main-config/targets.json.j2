@@ -1,0 +1,59 @@
+[
+    {
+        "targets": ["{{monitor_private_ip}}:9090"],
+        "labels": {
+            "env": "prod",
+            "job": "prometheus"
+        }
+    },
+    {
+        "targets": ["{{monitor_private_ip}}:3000"],
+        "labels": {
+            "env": "prod",
+            "job": "grafana"
+        }
+    },
+    {
+        "targets": ["{{monitor_private_ip}}:9100",
+            "{{elk_private_ip}}:9100",
+            "{{nginx_private_ip}}:9100",
+            "{{restapi_private_ip}}:9100", 
+            "{{gateway_private_ip_eth1}}:9100",
+            "{{gateway_private_ip_eth1}}:9200"],
+        "labels": {
+            "env": "prod",
+            "job": "node"
+        }
+    },
+    {
+        "targets": ["{{gateway_private_ip_eth1}}:9204"],
+        "labels": {
+            "env": "prod",
+            "job": "mysqld"
+        }
+    },
+    {
+        "targets": ["{{elk_private_ip}}:9114"],
+        "labels": {
+            "env": "prod",
+            "job": "elasticsearch"
+        } 
+    },
+    {
+        "targets": ["{{nginx_private_ip}}:9113"],
+        "labels": {
+            "env": "prod",
+            "job": "nginx-exporter"
+        }
+    },
+    {
+        "targets": ["{{restapi_private_ip}}:9110",
+            "{{gateway_private_ip_eth1}}:9210",
+            "{{nginx_private_ip}}:9110",
+            "{{elk_private_ip}}:9110"],
+        "labels": {
+            "env": "prod",
+            "job": "exporter"
+        } 
+    }
+]

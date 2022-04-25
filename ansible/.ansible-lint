@@ -1,0 +1,13 @@
+---
+exclude_paths:
+  - .cache/
+  - .github/
+  - .gitlab-ci.yml
+
+parseable: true
+quiet: true
+rulesdir:
+  - ./rules/
+
+use_default_rules: true
+verbosity: 1

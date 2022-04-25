@@ -1,0 +1,33 @@
+---
+- name: gateway startup
+  hosts: gateway_pub
+  become: yes
+  tasks:
+    - name: Install required packages
+      apt:
+        name:
+          - software-properties-common
+          - git
+        update_cache: yes
+
+    - name: Add ansible repo
+      apt_repository:
+        repo: "ppa:ansible/ansible"
+        state: present
+
+    - name: Install ansible
+      apt:
+        name: ansible
+        update_cache: yes
+
+    - name: Clone ansible git repositorty
+      git:
+        repo: https://ansible:{{ ansible_repo_access_token }}@gitlab.bukhara-chkh.ir/bukhara/ansible.git
+        dest: /home/ubuntu/ansible
+        clone: yes
+        update: yes
+      become: no
+
+    - name: Generate ssh keys
+      openssh_keypair:
+        path: ~/.ssh/id_rsa
